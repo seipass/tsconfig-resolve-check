@@ -5,13 +5,23 @@ compiler then silently compiles less than you think, or fails with an error that
 names the symptom and not the cause. This checks the two paths that **must be
 committed for the config to work**: `files` entries and `references[].path`.
 
+> **The first published figures (10 `files-missing`) were withdrawn on 2026-11-07.**
+> They were all false positives: `files` was resolved against the repository root
+> instead of the tsconfig's own directory. Fixed in 0.1.2; the numbers below are
+> measured after that fix, with `node tools/sweep.mjs`.
+
 Measured on 21 public repositories (20 had tsconfigs), with this tool's parser:
 
 | check | findings |
 |---|---|
-| `files-missing` | 10 |
+| `files-missing` | 0 |
 | `extends-missing` | 0 |
 | `reference-missing` | 0 |
+
+**We found nothing in that sample.** Every `files` entry, project reference and
+relative `extends` in those 20 repositories resolved. That is the honest result
+and it is not a selling point - a config that does not compile is a config someone
+has already fixed, so the classes this tool checks are quiet by construction.
 
 Run it in one command:
 
@@ -19,29 +29,12 @@ Run it in one command:
 npx --yes github:seipass/tsconfig-resolve-check#v0.1.1 .
 ```
 
-Real output, run against `nestjs/nest` (153 tsconfig files):
+## What this deliberately does not check
 
-```
-1 path in your tsconfig points at nothing.
-153 tsconfig files read in 2750 files.
-
-files-missing   tools/gulp/tsconfig.json:19
-                "files" lists "gulpfile.ts", which does not exist relative to /tools/gulp
-```
-
-## Also observed, and deliberately not counted
-
-`include` globs and `compilerOptions.paths` targets are checked too, and they are
-listed under their own heading with their own count. They are **not** reported as
-defects, because a build can create them: `next-env.d.ts`, `.svelte-kit/`,
-`.astro/types.d.ts` and `prisma/generated/**` are absent from every clone and
-entirely correct. Measured in the same sample: 138 `include` and 119 `paths`
-entries whose static prefix is absent. Treat them as a hint, not a verdict.
-
-The distinguishing rule, stated so you can disagree with it: **a reference is a
-defect only if the referenced artifact must be committed for the thing to work.**
-`files:` and `references:` qualify — the compiler opens them. A glob that a build
-satisfies does not.
+`include` globs and `compilerOptions.paths` targets are read but never reported:
+a build may produce the files they name (`next-env.d.ts`, `.astro/types.d.ts`,
+`prisma/generated/**` are absent from every clone and correct), so a miss is not a
+defect. A check that fails that test is not a feature with a caveat.
 
 ## What this cannot see
 
@@ -55,8 +48,8 @@ satisfies does not.
 - **Type correctness, module resolution, project-reference build graphs, extends
   chains.** Nothing is followed, evaluated or type-checked.
 - **Configs with comments.** They are read as JSONC (comments and trailing commas),
-  so a config TypeScript accepts is not rejected. Block scalars and JSON5 single
-  quotes are not supported, and the error message says it is our parser.
+  so a config TypeScript accepts is not rejected. JSON5 single quotes are not
+  supported, and the error message says it is our parser.
 - **Writing anything.** There is no write path in this package; fixes are prose.
 
 ## Exit codes and `--json`

@@ -76,14 +76,13 @@ test('include: dead prefix reported when there is no files list', () => {
   assert.equal(result.observations[0].check, 'include-missing');
 });
 
-test('files makes include inert: informational, and not counted as a defect', () => {
+test('files and include are a union: neither is reported inert', () => {
   const result = run(
     JSON.stringify({ files: ['src/index.ts'], include: ['missing/**/*.ts'] }),
     { 'tsconfig.json': '', 'src/index.ts': '' },
   );
-  assert.deepEqual(result.findings, [], 'inert include is not a defect');
-  assert.equal(result.observations.length, 1);
-  assert.equal(result.summary.findings, 0);
+  assert.deepEqual(result.findings, [], 'a dead include is an observation, never a defect');
+  assert.equal(result.findings.some((finding) => finding.check === 'include-inert'), false);
 });
 
 test('extends: relative missing is reported, bare specifiers and present files are not', () => {
@@ -116,4 +115,21 @@ test('a clean config produces no findings', () => {
   );
   assert.deepEqual(result.findings, []);
   assert.equal(result.ok, true);
+});
+
+test('files resolve beside their tsconfig, not at the repository root', () => {
+  const result = analyze({
+    configs: [{ path: 'packages/app/tsconfig.json', text: JSON.stringify({ files: ['src/main.ts'] }) }],
+    view: { root: '.', filePaths: ['packages/app/src/main.ts'] },
+  });
+  assert.deepEqual(result.findings, [], JSON.stringify(result.findings));
+});
+
+test('files in a nested tsconfig still reports a genuinely missing file', () => {
+  const result = analyze({
+    configs: [{ path: 'packages/app/tsconfig.json', text: JSON.stringify({ files: ['src/gone.ts'] }) }],
+    view: { root: '.', filePaths: ['packages/app/src/main.ts'] },
+  });
+  assert.equal(result.findings.length, 1);
+  assert.equal(result.findings[0].subject, 'src/gone.ts');
 });

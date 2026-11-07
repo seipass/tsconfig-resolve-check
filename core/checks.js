@@ -77,7 +77,8 @@ function checkFiles(tsconfig, files, directories, findings) {
   if (!node || node.type !== 'array') return;
   for (const item of node.items) {
     if (item.type !== 'string') continue;
-    const target = normalize(item.value);
+    // TypeScript resolves "files" relative to the tsconfig that declares it.
+    const target = normalize(joinPath(dirname(tsconfig.path), item.value));
     if (exists(target, files, directories)) continue;
     if (isUnjudgeable(target)) continue;
     findings.push({
@@ -143,10 +144,8 @@ function checkPaths(tsconfig, base, files, directories, findings) {
   }
 }
 
-/** `include` static prefixes. Inert when `files` is present, so then informational. */
+/** `include` static prefixes: observations, never defects (a build may produce them). */
 function checkInclude(tsconfig, base, files, directories, findings) {
-  const filesNode = getValue(tsconfig.root, 'files');
-  const filesPresent = Boolean(filesNode && filesNode.type === 'array');
   const node = getValue(tsconfig.root, 'include');
   if (!node || node.type !== 'array') return;
   for (const item of node.items) {
@@ -156,19 +155,14 @@ function checkInclude(tsconfig, base, files, directories, findings) {
     const resolved = normalize(joinPath(base, prefix));
     if (exists(resolved, files, directories)) continue;
     if (isUnjudgeable(resolved)) continue;
-    // A prefix with no existing parent is usually build output (next-env.d.ts,
-    // .astro/types.d.ts) rather than a typo. Report only when the surrounding
-    // directory exists, so the finding names a wrong entry, not a missing build.
     if (!exists(dirname(resolved), files, directories)) continue;
     findings.push({
-      check: filesPresent ? 'include-inert' : 'include-missing',
+      check: 'include-missing',
       severity: 'observation',
       file: tsconfig.path,
       line: item.line,
       subject: item.value,
-      detail: filesPresent
-        ? `include "${item.value}" has a static prefix (/${resolved}) that does not exist, but this config also sets "files", so TypeScript ignores "include" entirely`
-        : `include "${item.value}" has a static prefix (/${resolved}) that does not exist`,
+      detail: `include "${item.value}" has a static prefix (/${resolved}) that does not exist`,
     });
   }
 }

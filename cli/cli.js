@@ -33,7 +33,6 @@ Checks
   paths-missing      a "paths" target's static prefix does not exist
   include-missing    an "include" entry's static prefix does not exist
   extends-missing    a relative "extends" does not exist
-  include-inert      info only: "include" has a dead prefix, but "files" makes it inert
 `;
 
 export function main(argv = process.argv.slice(2)) {
