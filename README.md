@@ -22,7 +22,7 @@ committed for the config to work**: `files` entries and `references[].path`.
 Run it in one command:
 
 ```bash
-npx --yes github:seipass/tsconfig-resolve-check#v0.1.1 .
+npx --yes github:seipass/tsconfig-resolve-check#v0.1.2 .
 ```
 
 ## What this deliberately does not check
