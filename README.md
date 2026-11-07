@@ -32,7 +32,7 @@ Measured on 21 public repositories (20 had tsconfigs), with this tool's parser:
 Run it in one command:
 
 ```bash
-npx --yes github:seipass/tsconfig-resolve-check#v0.1.3 .
+npx --yes github:seipass/tsconfig-resolve-check#v0.1.4 .
 ```
 
 ## What this deliberately does not check

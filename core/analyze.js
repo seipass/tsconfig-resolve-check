@@ -7,7 +7,7 @@
 import { parseJsonc, JsoncError } from './jsonc.js';
 import { runChecks } from './checks.js';
 
-export const VERSION = '0.1.3';
+export const VERSION = '0.1.4';
 
 const TSCONFIG = /(^|\/)tsconfig[^/]*\.json$/i;
 
