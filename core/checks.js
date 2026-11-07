@@ -133,6 +133,7 @@ function checkPaths(tsconfig, base, files, directories, findings) {
       if (!exists(dirname(normalize(resolved)), files, directories)) continue;
       findings.push({
         check: 'paths-missing',
+        severity: 'observation',
         file: tsconfig.path,
         line: target.line,
         subject: target.value,

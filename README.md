@@ -16,7 +16,7 @@ Measured on 21 public repositories (20 had tsconfigs), with this tool's parser:
 Run it in one command:
 
 ```bash
-npx --yes github:seipass/tsconfig-resolve-check#v0.1.0 .
+npx --yes github:seipass/tsconfig-resolve-check#v0.1.1 .
 ```
 
 Real output, run against `nestjs/nest` (153 tsconfig files):

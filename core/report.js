@@ -4,7 +4,6 @@
 const CHECK_WIDTH = 16;
 // Only what must be committed for the config to work counts as a defect.
 const DEAD = ['files-missing', 'reference-missing', 'extends-missing'];
-const OBSERVATIONS = ['include-missing', 'paths-missing', 'include-inert'];
 
 export function renderText(result) {
   const lines = [];
@@ -19,23 +18,10 @@ export function renderText(result) {
   lines.push(verdict(result));
   lines.push(`${result.summary.tsconfigs} tsconfig file${result.summary.tsconfigs === 1 ? '' : 's'} read in ${result.summary.files_scanned} files.`);
 
-  for (const finding of result.findings.filter((item) => !OBSERVATIONS.includes(item.check))) {
+  for (const finding of result.findings) {
     lines.push('');
     lines.push(`${finding.check.padEnd(CHECK_WIDTH)}${finding.file}:${finding.line}`);
     lines.push(`${' '.repeat(CHECK_WIDTH)}${finding.detail}`);
-  }
-
-  const observations = result.findings.filter((item) => OBSERVATIONS.includes(item.check) && item.severity !== 'info');
-  if (observations.length > 0) {
-    lines.push('');
-    lines.push(`Also observed: ${observations.length} include/paths entr${observations.length === 1 ? 'y' : 'ies'} name paths`);
-    lines.push('that may be produced by a build and are absent from every clone. Not counted above,');
-    lines.push('because a build can satisfy them:');
-    for (const finding of observations) {
-      lines.push('');
-      lines.push(`${finding.check.padEnd(CHECK_WIDTH)}${finding.file}:${finding.line}`);
-      lines.push(`${' '.repeat(CHECK_WIDTH)}${finding.detail}`);
-    }
   }
 
   if (result.skipped.length > 0) {

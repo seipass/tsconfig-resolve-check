@@ -36,24 +36,26 @@ export function analyze({ configs, view }) {
   const { findings, skipped } = runChecks({ tsconfigs, view });
   findings.sort((a, b) => (a.file === b.file ? a.line - b.line : a.file.localeCompare(b.file)));
 
+  const defects = findings.filter((finding) => !['info', 'observation'].includes(finding.severity));
+  const observations = findings.filter((finding) => finding.severity === 'observation');
   const byCheck = {};
-  for (const finding of findings) byCheck[finding.check] = (byCheck[finding.check] ?? 0) + 1;
+  for (const finding of defects) byCheck[finding.check] = (byCheck[finding.check] ?? 0) + 1;
 
   return {
     ok: errors.length === 0,
     version: VERSION,
     root: view.root ?? '.',
     tsconfigs: tsconfigs.map((config) => ({ path: config.path })),
-    findings,
+    findings: defects,
+    observations,
     skipped,
     errors,
     summary: {
       tsconfigs: configs.length,
       tsconfigs_parsed: tsconfigs.length,
       // A defect is something that must be committed for the config to work.
-      findings: findings.filter((finding) => !['info', 'observation'].includes(finding.severity)).length,
-      observations: findings.filter((finding) => finding.severity === 'observation').length,
-      informational: findings.filter((finding) => finding.severity === 'info').length,
+      findings: defects.length,
+      observations: observations.length,
       by_check: byCheck,
       files_scanned: (view.filePaths ?? []).length,
     },

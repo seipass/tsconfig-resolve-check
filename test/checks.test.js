@@ -64,15 +64,16 @@ test('paths: static prefix is resolved from baseUrl; dead alias reported, live o
     JSON.stringify({ compilerOptions: { baseUrl: '.', paths: { '@/*': ['./src/*'], '#gone/*': ['./nope/*'] } } }),
     { 'tsconfig.json': '', 'src/app.ts': '' },
   );
-  assert.equal(result.findings.length, 1);
-  assert.equal(result.findings[0].check, 'paths-missing');
-  assert.equal(result.findings[0].subject, './nope/*');
+  assert.deepEqual(result.findings, []);
+  assert.equal(result.observations.length, 1);
+  assert.equal(result.observations[0].check, 'paths-missing');
 });
 
 test('include: dead prefix reported when there is no files list', () => {
   const result = run(JSON.stringify({ include: ['src', 'missing/**/*.ts'] }), { 'tsconfig.json': '', 'src/a.ts': '' });
-  assert.equal(result.findings.length, 1);
-  assert.equal(result.findings[0].check, 'include-missing');
+  assert.deepEqual(result.findings, []);
+  assert.equal(result.observations.length, 1);
+  assert.equal(result.observations[0].check, 'include-missing');
 });
 
 test('files makes include inert: informational, and not counted as a defect', () => {
@@ -80,9 +81,8 @@ test('files makes include inert: informational, and not counted as a defect', ()
     JSON.stringify({ files: ['src/index.ts'], include: ['missing/**/*.ts'] }),
     { 'tsconfig.json': '', 'src/index.ts': '' },
   );
-  assert.equal(result.findings.length, 1);
-  assert.equal(result.findings[0].check, 'include-inert');
-  assert.equal(result.findings[0].severity, 'observation');
+  assert.deepEqual(result.findings, [], 'inert include is not a defect');
+  assert.equal(result.observations.length, 1);
   assert.equal(result.summary.findings, 0);
 });
 
