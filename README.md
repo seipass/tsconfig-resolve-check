@@ -5,23 +5,19 @@ compiler then silently compiles less than you think, or fails with an error that
 names the symptom and not the cause. This checks the two paths that **must be
 committed for the config to work**: `files` entries and `references[].path`.
 
-> **The first published figures (10 `files-missing`) were withdrawn on 2026-11-07.**
-> They were all false positives: `files` was resolved against the repository root
-> instead of the tsconfig's own directory. Fixed in 0.1.2; the numbers below are
-> measured after that fix, with `node tools/sweep.mjs`.
-
-Measured on 21 public repositories (20 had tsconfigs), with this tool's parser:
-
-| check | findings |
-|---|---|
-| `files-missing` | 0 |
-| `extends-missing` | 0 |
-| `reference-missing` | 0 |
-
-**We found nothing in that sample.** Every `files` entry, project reference and
-relative `extends` in those 20 repositories resolved. That is the honest result
-and it is not a selling point - a config that does not compile is a config someone
-has already fixed, so the classes this tool checks are quiet by construction.
+> **The published figures in `v0.1.1` are withdrawn.**
+> A defect in that release resolved `files` against the repository root instead of
+> the tsconfig that declares it, so every nested tsconfig with a `files` list
+> produced a false finding: the published "10 findings" were all false positives,
+> and four of them were checked against the live repositories by hand. `files` and
+> `extends` resolve relative to their tsconfig, as they always should have; the fix
+> is in `0.1.2`, which also applies the generated-path exemption to `files` and
+> removes an `include-inert` observation that `tsc --listFiles` refutes.
+>
+> No table is claimed here. The re-run of the same 21-repository sample after the
+> fix (`node tools/sweep.mjs`) found **no defects in the 20 repositories that have
+> a tsconfig**. That is a weaker product than the invented one and it is the true
+> one: a tsconfig that names a missing file is a config someone has already fixed.
 
 Run it in one command:
 
