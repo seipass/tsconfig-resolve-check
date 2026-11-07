@@ -1,23 +1,33 @@
-# tsconfig pointing at nothing: files and references your config lists but the repo does not have
+# tsconfig entries that point at nothing: 0 findings in 20 repositories
+
+**That is the measured result, and it leads the README.** Running this tool over the
+20 repositories in our sample that have a tsconfig produced no findings: every
+`files` entry, project reference and relative `extends` resolved. A config that
+names a missing file is a config someone has already fixed, so this class is quiet
+by construction. The tool is published because it is **correct**, not because it is
+loud.
+
+> **The figures published in `v0.1.1` are withdrawn.** That release resolved
+> `files` against the repository root instead of the tsconfig that declares it, so
+> every nested tsconfig with a `files` list produced a false finding: the published
+> "10 findings" were all false positives, four of them checked by hand against the
+> live repositories. The fix is in `0.1.3`, which also exempts generated files
+> (`next-env.d.ts`) for `files` and removes an `include-inert` observation that
+> `tsc --listFiles` refutes — `files` and `include` are a union, not a replacement.
 
 A `tsconfig.json` can name a file or a project reference that does not exist. The
 compiler then silently compiles less than you think, or fails with an error that
-names the symptom and not the cause. This checks the two paths that **must be
-committed for the config to work**: `files` entries and `references[].path`.
+names the symptom and not the cause. This checks the paths that **must be committed
+for the config to work**: `files` entries, `references[].path`, and relative
+`extends`.
 
-> **The published figures in `v0.1.1` are withdrawn.**
-> A defect in that release resolved `files` against the repository root instead of
-> the tsconfig that declares it, so every nested tsconfig with a `files` list
-> produced a false finding: the published "10 findings" were all false positives,
-> and four of them were checked against the live repositories by hand. `files` and
-> `extends` resolve relative to their tsconfig, as they always should have; the fix
-> is in `0.1.2`, which also applies the generated-path exemption to `files` and
-> removes an `include-inert` observation that `tsc --listFiles` refutes.
->
-> No table is claimed here. The re-run of the same 21-repository sample after the
-> fix (`node tools/sweep.mjs`) found **no defects in the 20 repositories that have
-> a tsconfig**. That is a weaker product than the invented one and it is the true
-> one: a tsconfig that names a missing file is a config someone has already fixed.
+Measured on 21 public repositories (20 had tsconfigs), with this tool's parser:
+
+| check | findings |
+|---|---|
+| `files-missing` | 0 |
+| `extends-missing` | 0 |
+| `reference-missing` | 0 |
 
 Run it in one command:
 
