@@ -1,6 +1,6 @@
 {
   "name": "tsconfig-resolve-check",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Find tsconfig include/exclude/files/references/paths settings that point at nothing - the ones that silently stop your code being compiled.",
   "keywords": ["typescript", "tsconfig", "lint", "cli", "monorepo"],
   "license": "MIT",

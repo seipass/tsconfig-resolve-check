@@ -31,8 +31,13 @@ const UNJUDGEABLE = [
   '.vercel',
 ];
 
+/** Files a toolchain generates at build time: absent from every clone and correct. */
+const GENERATED_FILES = ['next-env.d.ts', '.eslintcache'];
+
 export function isUnjudgeable(path) {
   const parts = String(path).split('/');
+  const base = parts[parts.length - 1];
+  if (GENERATED_FILES.includes(base)) return true;
   return parts.some((part) => UNJUDGEABLE.includes(part));
 }
 

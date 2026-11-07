@@ -133,3 +133,11 @@ test('files in a nested tsconfig still reports a genuinely missing file', () => 
   assert.equal(result.findings.length, 1);
   assert.equal(result.findings[0].subject, 'src/gone.ts');
 });
+
+test('a generated next-env.d.ts is not a defect (it is in every Next.js clone)', () => {
+  const result = analyze({
+    configs: [{ path: 'apps/web/tsconfig.json', text: JSON.stringify({ files: ['next-env.d.ts'] }) }],
+    view: { root: '.', filePaths: ['apps/web/package.json'] },
+  });
+  assert.deepEqual(result.findings, [], JSON.stringify(result.findings));
+});

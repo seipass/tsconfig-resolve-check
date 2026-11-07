@@ -22,7 +22,7 @@ committed for the config to work**: `files` entries and `references[].path`.
 Run it in one command:
 
 ```bash
-npx --yes github:seipass/tsconfig-resolve-check#v0.1.2 .
+npx --yes github:seipass/tsconfig-resolve-check#v0.1.3 .
 ```
 
 ## What this deliberately does not check
@@ -40,7 +40,8 @@ defect. A check that fails that test is not a feature with a caveat.
   matching rules, which this tool does not model.
 - **Generated files.** A missing path inside `node_modules`, `.next`, `dist`,
   `build`, `out`, `coverage`, `.turbo`, `.nuxt`, `.svelte-kit` or `.vercel` is
-  never reported: those directories are not in a git tree by construction.
+  never reported, and neither is `next-env.d.ts`, which Next.js writes at build
+  time: those paths are not in a git tree by construction.
 - **Type correctness, module resolution, project-reference build graphs, extends
   chains.** Nothing is followed, evaluated or type-checked.
 - **Configs with comments.** They are read as JSONC (comments and trailing commas),
